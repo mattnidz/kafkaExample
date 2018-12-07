@@ -1,0 +1,63 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: producer
+  name: producer
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: producer
+    spec:
+      containers:
+      - env:
+        - name: KAFKA_BROKER_ID
+          value: "1"
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: "zoo1:2181,zoo2:2181,zoo3:2181"
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: PLAINTEXT://kafka1:9092
+        image: localhost:5000/producer
+        name: producer
+        command: [ "/bin/bash", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]
+        resources: {}
+      hostname: producer
+      restartPolicy: Always
+status: {}
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: consumer
+  name: consumer
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: consumer
+    spec:
+      containers:
+      - env:
+        - name: KAFKA_BROKER_ID
+          value: "1"
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: "zoo1:2181,zoo2:2181,zoo3:2181"
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: PLAINTEXT://kafka1:9092
+        image: localhost:5000/consumer
+        name: consumer
+        resources: {}
+      hostname: consumer
+      restartPolicy: Always
+status: {}
